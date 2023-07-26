@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>뉴모피즘 계산기</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+    }
+
+    .calculator {
+      background-color: #f0f0f0;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      width: 300px;
+      font-family: Arial, sans-serif;
+    }
+
+    .display {
+      background-color: #e5e5e5;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 10px;
+      text-align: right;
+      font-size: 24px;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-gap: 10px;
+    }
+
+    button {
+      padding: 10px;
+      font-size: 20px;
+      background-color: #ffffff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .operator {
+      background-color: #ffe066;
+      color: #000000;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <div class="display">
+      <span id="result">0</span>
+    </div>
+    <div class="buttons">
+      <button class="operator" onclick="clearDisplay()">C</button>
+      <button class="operator" onclick="deleteChar()"><img src="delete_icon.png" alt="delete"></button>
+      <button class="operator" onclick="appendChar('/')">÷</button>
+      <button onclick="appendChar('7')">7</button>
+      <button onclick="appendChar('8')">8</button>
+      <button onclick="appendChar('9')">9</button>
+      <button class="operator" onclick="appendChar('*')">×</button>
+      <button onclick="appendChar('4')">4</button>
+      <button onclick="appendChar('5')">5</button>
+      <button onclick="appendChar('6')">6</button>
+      <button class="operator" onclick="appendChar('-')">-</button>
+      <button onclick="appendChar('1')">1</button>
+      <button onclick="appendChar('2')">2</button>
+      <button onclick="appendChar('3')">3</button>
+      <button class="operator" onclick="appendChar('+')">+</button>
+      <button onclick="appendChar('0')">0</button>
+      <button onclick="appendChar('.')">.</button>
+      <button class="operator" onclick="calculate()">=</button>
+    </div>
+  </div>
+  <script>
+    let displayValue = '0';
+
+    function updateDisplay() {
+      document.getElementById('result').innerText = displayValue;
+    }
+
+    function appendChar(char) {
+      if (displayValue === '0') {
+        displayValue = char;
+      } else {
+        displayValue += char;
+      }
+      updateDisplay();
+    }
+
+    function clearDisplay() {
+      displayValue = '0';
+      updateDisplay();
+    }
+
+    function deleteChar() {
+      displayValue = displayValue.slice(0, -1);
+      if (displayValue === '') {
+        displayValue = '0';
+      }
+      updateDisplay();
+    }
+
+    function calculate() {
+      try {
+        const result = eval(displayValue);
+        displayValue = result.toString();
+        updateDisplay();
+      } catch (error) {
+        displayValue = 'Error';
+        updateDisplay();
+      }
+    }
+
+    updateDisplay();
+  </script>
+</body>
+</html>
