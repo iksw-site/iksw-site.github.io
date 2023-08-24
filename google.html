@@ -1,102 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>정보 추가 및 조회</title>
+  <title>개인화 정보 추가</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f7f7f7;
-      margin: 0;
-      padding: 0;
-    }
-
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 30px;
-      background-color: #fff;
-      border-radius: 5px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    form {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-
-    input {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 3px;
-    }
-
-    button {
-      display: block;
-      width: 100%;
-      padding: 10px;
-      background-color: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 3px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #0056b3;
-    }
-
-    #infoList {
-      padding: 20px;
-      background-color: #f7f7f7;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-
-    .info {
-      margin-bottom: 10px;
-      padding: 10px;
-      background-color: #fff;
-      border: 1px solid #ccc;
-      border-radius: 3px;
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-    }
-
-    #sheetLink {
-      text-align: center;
-      margin-top: 20px;
-    }
+    /* 스타일링 부분은 이전과 동일하므로 생략합니다. */
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>정보 추가 및 조회</h1>
-    <form id="infoForm">
-      <label for="name">이름:</label>
-      <input type="text" id="name" name="name" required>
-      
-      <label for="hobby">취미:</label>
-      <input type="text" id="hobby" name="hobby" required>
-      
-      <label for="interest">관심사:</label>
-      <input type="text" id="interest" name="interest" required>
-      
-      <button type="button" id="addButton">정보 추가</button>
-      <button type="button" id="getButton">정보 조회</button>
-    </form>
-    <div id="result"></div>
-    <div id="infoList"></div>
+    <h1>개인화 정보 추가</h1>
+    <button type="button" id="loginButton">구글 로그인</button>
+    <div id="userInfo" style="display: none;">
+      <p>안녕하세요, <span id="userName"></span>님!</p>
+      <form id="infoForm">
+        <label for="hobby">취미:</label>
+        <input type="text" id="hobby" name="hobby" required>
+        
+        <label for="interest">관심사:</label>
+        <input type="text" id="interest" name="interest" required>
+        
+        <button type="button" id="addButton">정보 추가</button>
+      </form>
+      <div id="result"></div>
+    </div>
     <div id="sheetLink">
       <p>구글 시트에서 정보를 실시간으로 확인하세요:</p>
       <a href="https://docs.google.com/spreadsheets/d/1qX8Vdy9gtixR4-jo33sU19HF97XrtwsnfmxJuRYvLpE/edit#gid=0" target="_blank">구글 시트로 이동</a>
@@ -105,46 +31,75 @@
   
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      var form = document.getElementById('infoForm');
+      var loginButton = document.getElementById('loginButton');
+      var userInfoDiv = document.getElementById('userInfo');
+      var userNameSpan = document.getElementById('userName');
+      var infoForm = document.getElementById('infoForm');
       var addButton = document.getElementById('addButton');
-      var getButton = document.getElementById('getButton');
       var resultDiv = document.getElementById('result');
-      var infoListDiv = document.getElementById('infoList');
+      var accessToken = null;
 
-      addButton.addEventListener('click', function() {
-        var name = document.getElementById('name').value;
-        var hobby = document.getElementById('hobby').value;
-        var interest = document.getElementById('interest').value;
+      // 구글 로그인 버튼 클릭 시
+      loginButton.addEventListener('click', function() {
+        var clientId = '424155591004-m2fgff8ilr5sj9dpq8kjekeqbhkuhmml.apps.googleusercontent.com';  // Google API 클라이언트 ID
+        var redirectUri = 'https://iksw-site.github.io/google.html';  // 리다이렉트 URI
+        var scope = 'profile email';  // 요청할 권한(scope)
 
-        var url = "https://script.google.com/macros/s/AKfycbws-pFp_aLBpDtS19XShKoGKAlHH1E4hXMTcVALPhmnWlVt8VgEomDBRUmAlZ199xBu/exec";
-        url += "?action=add&name=" + encodeURIComponent(name) + "&hobby=" + encodeURIComponent(hobby) + "&interest=" + encodeURIComponent(interest);
+        var authUrl = 'https://accounts.google.com/o/oauth2/auth?' +
+          'client_id=' + clientId +
+          '&redirect_uri=' + redirectUri +
+          '&scope=' + scope +
+          '&response_type=token';
 
-        fetch(url)
+        window.location.href = authUrl;
+      });
+
+      // 로그인 성공 후
+      var hash = window.location.hash.substring(1);
+      var hashParams = {};
+      var e, a = /\+/g, r = /([^&;=]+)=?([^&;]*)/g, d = function (s) { return decodeURIComponent(s.replace(a, " ")); };
+      while (e = r.exec(hash)) hashParams[d(e[1])] = d(e[2]);
+
+      if (hashParams.access_token) {
+        loginButton.style.display = 'none';
+        userInfoDiv.style.display = 'block';
+        accessToken = hashParams.access_token;
+
+        // 여기서 사용자 정보를 가져와서 userNameSpan에 표시
+        fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+          method: 'GET',
+          headers: {
+            'Authorization': 'Bearer ' + accessToken
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          userNameSpan.textContent = data.name;
+        })
+        .catch(error => {
+          console.error('Error fetching user info:', error);
+        });
+
+        // 정보 추가 버튼 클릭 시
+        addButton.addEventListener('click', function() {
+          var hobby = document.getElementById('hobby').value;
+          var interest = document.getElementById('interest').value;
+
+          fetch('https://script.google.com/macros/s/AKfycbxjdHddfxirGNH4cXU9X339hl4umvcMP33zIQ5aYM1O68mGRlY4s1P_mhZb5qw1l8fw/exec', {
+            method: 'GET',
+            headers: {
+              'Authorization': 'Bearer ' + accessToken
+            }
+          })
           .then(response => response.text())
           .then(data => {
             resultDiv.textContent = data;
           })
           .catch(error => {
-            console.error('Error:', error);
+            console.error('Error adding info:', error);
           });
-      });
-
-      getButton.addEventListener('click', function() {
-        var url = "https://script.google.com/macros/s/AKfycbws-pFp_aLBpDtS19XShKoGKAlHH1E4hXMTcVALPhmnWlVt8VgEomDBRUmAlZ199xBu/exec?action=get";
-
-        fetch(url)
-          .then(response => response.json())
-          .then(data => {
-            var infoList = "";
-            data.forEach(info => {
-              infoList += "<p><strong>이름:</strong> " + info.이름 + ", <strong>취미:</strong> " + info.취미 + ", <strong>관심사:</strong> " + info.관심사 + "</p>";
-            });
-            infoListDiv.innerHTML = infoList;
-          })
-          .catch(error => {
-            console.error('Error:', error);
-          });
-      });
+        });
+      }
     });
   </script>
 </body>
