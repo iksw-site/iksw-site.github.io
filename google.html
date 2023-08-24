@@ -1,14 +1,75 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>개인화 정보 추가</title>
+  <title>개인화 정보 추가 및 조회</title>
   <style>
-    /* 스타일링 부분은 이전과 동일하므로 생략합니다. */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 30px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    form {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #result {
+      margin-top: 20px;
+    }
+
+    #sheetLink {
+      text-align: center;
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>개인화 정보 추가</h1>
+    <h1>개인화 정보 추가 및 조회</h1>
     <button type="button" id="loginButton">구글 로그인</button>
     <div id="userInfo" style="display: none;">
       <p>안녕하세요, <span id="userName"></span>님!</p>
@@ -22,6 +83,8 @@
         <button type="button" id="addButton">정보 추가</button>
       </form>
       <div id="result"></div>
+      <button type="button" id="getButton">정보 조회</button>
+      <div id="infoList"></div>
     </div>
     <div id="sheetLink">
       <p>구글 시트에서 정보를 실시간으로 확인하세요:</p>
@@ -36,7 +99,9 @@
       var userNameSpan = document.getElementById('userName');
       var infoForm = document.getElementById('infoForm');
       var addButton = document.getElementById('addButton');
+      var getButton = document.getElementById('getButton');
       var resultDiv = document.getElementById('result');
+      var infoListDiv = document.getElementById('infoList');
       var accessToken = null;
 
       // 구글 로그인 버튼 클릭 시
@@ -85,18 +150,33 @@
           var hobby = document.getElementById('hobby').value;
           var interest = document.getElementById('interest').value;
 
-          fetch('https://script.google.com/macros/s/AKfycbxjdHddfxirGNH4cXU9X339hl4umvcMP33zIQ5aYM1O68mGRlY4s1P_mhZb5qw1l8fw/exec', {
-            method: 'GET',
-            headers: {
-              'Authorization': 'Bearer ' + accessToken
-            }
-          })
+          fetch('https://script.google.com/macros/s/AKfycbxjdHddfxirGNH4cXU9X339hl4umvcMP33zIQ5aYM1O68mGRlY4s1P_mhZb5qw1l8fw/exec?action=add&access_token=' + accessToken + '&hobby=' + hobby + '&interest=' + interest)
           .then(response => response.text())
           .then(data => {
             resultDiv.textContent = data;
           })
           .catch(error => {
             console.error('Error adding info:', error);
+          });
+        });
+
+        // 정보 조회 버튼 클릭 시
+        getButton.addEventListener('click', function() {
+          fetch('https://script.google.com/macros/s/AKfycbxjdHddfxirGNH4cXU9X339hl4umvcMP33zIQ5aYM1O68mGRlY4s1P_mhZb5qw1l8fw/exec?action=get&access_token=' + accessToken)
+          .then(response => response.json())
+          .then(data => {
+            var infoHtml = '';
+            data.forEach(function(info) {
+              infoHtml += '<div class="info">';
+              infoHtml += '<p><strong>이름:</strong> ' + info.이름 + '</p>';
+              infoHtml += '<p><strong>취미:</strong> ' + info.취미 + '</p>';
+              infoHtml += '<p><strong>관심사:</strong> ' + info.관심사 + '</p>';
+              infoHtml += '</div>';
+            });
+            infoListDiv.innerHTML = infoHtml;
+          })
+          .catch(error => {
+            console.error('Error fetching info:', error);
           });
         });
       }
