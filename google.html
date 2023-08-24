@@ -150,7 +150,7 @@
           var hobby = document.getElementById('hobby').value;
           var interest = document.getElementById('interest').value;
 
-          fetch('https://script.google.com/macros/s/AKfycbxjdHddfxirGNH4cXU9X339hl4umvcMP33zIQ5aYM1O68mGRlY4s1P_mhZb5qw1l8fw/exec?action=add&access_token=' + accessToken + '&hobby=' + hobby + '&interest=' + interest)
+          fetch('https://script.google.com/macros/s/AKfycbwJ2pBM894UHRfszGLfDtINHHATfEBd83K0S1H9jiofPzJ1McKxAaeHQ5p0O2I1sZ5x6Q/exec?action=add&access_token=' + accessToken + '&hobby=' + hobby + '&interest=' + interest)
           .then(response => response.text())
           .then(data => {
             resultDiv.textContent = data;
@@ -162,7 +162,7 @@
 
         // 정보 조회 버튼 클릭 시
         getButton.addEventListener('click', function() {
-          fetch('https://script.google.com/macros/s/AKfycbxjdHddfxirGNH4cXU9X339hl4umvcMP33zIQ5aYM1O68mGRlY4s1P_mhZb5qw1l8fw/exec?action=get&access_token=' + accessToken)
+          fetch('https://script.google.com/macros/s/AKfycbwJ2pBM894UHRfszGLfDtINHHATfEBd83K0S1H9jiofPzJ1McKxAaeHQ5p0O2I1sZ5x6Q/exec?action=get&access_token=' + accessToken)
           .then(response => response.json())
           .then(data => {
             var infoHtml = '';
