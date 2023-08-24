@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>정보 추가 및 조회</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 30px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    form {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #infoList {
+      padding: 20px;
+      background-color: #f7f7f7;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .info {
+      margin-bottom: 10px;
+      padding: 10px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    #sheetLink {
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>정보 추가 및 조회</h1>
+    <form id="infoForm">
+      <label for="name">이름:</label>
+      <input type="text" id="name" name="name" required>
+      
+      <label for="hobby">취미:</label>
+      <input type="text" id="hobby" name="hobby" required>
+      
+      <label for="interest">관심사:</label>
+      <input type="text" id="interest" name="interest" required>
+      
+      <button type="button" id="addButton">정보 추가</button>
+      <button type="button" id="getButton">정보 조회</button>
+    </form>
+    <div id="result"></div>
+    <div id="infoList"></div>
+    <div id="sheetLink">
+      <p>구글 시트에서 정보를 실시간으로 확인하세요:</p>
+      <a href="https://docs.google.com/spreadsheets/d/1qX8Vdy9gtixR4-jo33sU19HF97XrtwsnfmxJuRYvLpE/edit#gid=0" target="_blank">구글 시트로 이동</a>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var form = document.getElementById('infoForm');
+      var addButton = document.getElementById('addButton');
+      var getButton = document.getElementById('getButton');
+      var resultDiv = document.getElementById('result');
+      var infoListDiv = document.getElementById('infoList');
+
+      addButton.addEventListener('click', function() {
+        var name = document.getElementById('name').value;
+        var hobby = document.getElementById('hobby').value;
+        var interest = document.getElementById('interest').value;
+
+        var url = "https://script.google.com/macros/s/AKfycbws-pFp_aLBpDtS19XShKoGKAlHH1E4hXMTcVALPhmnWlVt8VgEomDBRUmAlZ199xBu/exec";
+        url += "?action=add&name=" + encodeURIComponent(name) + "&hobby=" + encodeURIComponent(hobby) + "&interest=" + encodeURIComponent(interest);
+
+        fetch(url)
+          .then(response => response.text())
+          .then(data => {
+            resultDiv.textContent = data;
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+      });
+
+      getButton.addEventListener('click', function() {
+        var url = "https://script.google.com/macros/s/AKfycbws-pFp_aLBpDtS19XShKoGKAlHH1E4hXMTcVALPhmnWlVt8VgEomDBRUmAlZ199xBu/exec?action=get";
+
+        fetch(url)
+          .then(response => response.json())
+          .then(data => {
+            var infoList = "";
+            data.forEach(info => {
+              infoList += "<p><strong>이름:</strong> " + info.이름 + ", <strong>취미:</strong> " + info.취미 + ", <strong>관심사:</strong> " + info.관심사 + "</p>";
+            });
+            infoListDiv.innerHTML = infoList;
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+      });
+    });
+  </script>
+</body>
+</html>
